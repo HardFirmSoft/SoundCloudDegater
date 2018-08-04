@@ -1,11 +1,16 @@
-from setuptools import setup
+import setuptools
 
-setup(name='funniest',
-      version='0.1',
-      description='The funniest joke in the world',
-      url='http://github.com/storborg/funniest',
-      author='Flying Circus',
-      author_email='flyingcircus@example.com',
-      license='MIT',
-      packages=['funniest'],
-      zip_safe=False)
+with open("README.md", "r") as file:
+    readme = file.read()
+setuptools.setup(
+    name="soundcloud_degater",
+    version="0.0.1",
+    description="Download from SoundCloud in the best quality, regardless of gates.",
+    long_description=readme,
+    long_description_content_type="text/markdown",
+    url="https://github.com/HardFirmSoft/SoundCloudDegater",
+    packages=["soundcloud_degater"],
+    install_requires=[
+        ''
+    ]
+)
