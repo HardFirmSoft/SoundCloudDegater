@@ -3,15 +3,6 @@ from urllib.parse import urlparse
 from soundcloud_parse import soundcloud_parser
 
 
-def getDomain(url):
-    split_url = url.split('/')
-
-    if 'http' in url:
-        del split_url[:2]
-
-    return split_url[0]
-
-
 if __name__ == "__main__":
 
     # arg parsing

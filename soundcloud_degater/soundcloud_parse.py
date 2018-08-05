@@ -39,7 +39,7 @@ class soundcloud_parser(object):
 
     def process_user(self, url):
         _user = self.get_user(url)
-        _process_tracks = self.get_user_tracks(_user)
+        _tracks = self.get_user_tracks(_user)
         self.download_tracks(_tracks)
 
     def process_track(self, url):
@@ -215,8 +215,6 @@ class soundcloud_parser(object):
             'type': playlist.playlist_type,
             'tracks': [],
         }
-
-        print(_playlist['type'])
 
         for track in playlist.tracks:
             # maybe this is unecessary, most of this info is already in
