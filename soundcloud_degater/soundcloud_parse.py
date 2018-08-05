@@ -12,8 +12,10 @@ class soundcloud_parser(object):
         self.process_names = kwargs['process_names']
         self.playlist_albums = kwargs['playlist_albums']
 
-        self.album_types = ['album', 'demo', 'compilation']     # if playlist of these types, group as an album
-        self.remix_types = ['remix', 'flip']                    # if any of these in the title of a track, process as a remix
+        # if playlist of these types, group as an album
+        self.album_types = ['album', 'compilation', 'demo', 'ep']
+        # if any of these words are in the title of a track, process as a remix
+        self.remix_types = ['remix', 'flip']
 
         # this is the object that allows us to make easy soundcloud api calls
         self.client = soundcloud.Client(client_id=self.client_id)
@@ -40,18 +42,17 @@ class soundcloud_parser(object):
         _process_tracks = self.get_user_tracks(_user)
         self.download_tracks(_tracks)
 
-    def track(self, url):
+    def process_track(self, url):
         _track = self.get_track(url)
         self.download_tracks([_track])
 
-    def _process_set(self, url):
+    def process_set(self, url):
         _set = self.get_set(url)
-        self.download_tracks(_set['tracks'])
+        self.download_sets([_set])
 
-    def _process_sets(self, url):
+    def process_sets(self, url):
         _sets = self.get_sets(url)
-        for _set in _sets:
-            self.download_tracks(_set['tracks'])
+        self.download_sets(_sets)
 
     ##############
     # Call Types
@@ -63,6 +64,7 @@ class soundcloud_parser(object):
         #   user            https://soundcloud.com/xavi_real
         #   track           https://soundcloud.com/super7records/xavi-al-capone
         #   set/playlist    https://soundcloud.com/xavi_real/sets/al-capone
+        #   sets            https://soundcloud.com/xavi_real/sets
 
         #   /user/sets/set_name
         #   OR
@@ -99,8 +101,9 @@ class soundcloud_parser(object):
     ###############
 
     def download_sets(self, sets):
-        for tracks in sets:
-            self.download_tracks(tracks)
+        for s in sets:
+            print('--------------------\n', s['title'])
+            self.download_tracks(s['tracks'])
 
     def download_tracks(self, tracks):
         for track in tracks:
@@ -110,7 +113,7 @@ class soundcloud_parser(object):
         # to do
         # actually DOWNLOAD track
 
-        print(track)
+        print('\n', track, '\n')
         pass
 
     ################
@@ -119,55 +122,133 @@ class soundcloud_parser(object):
 
     def get_user(self, url):
         user = self.client.get('/resolve/', url=url)
-        _user = self.dictionize_user(user)
-
-        return _user
-
-    def dictionize_user(self, user):
-        _user = {
-            'id': user.id,
-            'username': user.username,
-            'avatar_url': user.avatar_url,
-        }
-
+        _user = self.dictionize_user_obj(user)
         return _user
 
     def get_track(self, url):
-
         track = self.client.get('/resolve/', url=url)
-        user = self.client.get('/users/' + str(track.user_id))
-
-        _user = self.dictionize_user(user)
-        _track = self.dictionize_track(track, _user)
-
+        _user = self.redictionize_user(track.user)
+        _track = self.dictionize_track_obj(track, _user)
         return _track
 
     def get_user_tracks(self, _user):
         tracks = self.client.get('/users/' + str(_user['id']) + '/tracks/')
-
         _tracks = []
-        for t in tracks:
-            _track = self.dictionize_track(t, _user)
-            _tracks.append(_track)
 
+        for t in tracks:
+            _track = self.dictionize_track_obj(t, _user)
+            _tracks.append(_track)
         return _tracks
 
-    def dictionize_track(self, track, user):
+    def get_set(self, url):
+        playlist = self.client.get('/resolve/', url=url)
+        _playlist = self.dictionize_set_obj(playlist)
+        return _playlist
 
+    def get_sets(self, url):
+        playlists = self.client.get('/resolve/', url=url)
+        _playlists = self.dictionize_sets(playlists)
+        return _playlists
+
+    #######################
+    # Dictionary Builders
+    #######################
+
+    def dictionize_user_obj(self, user):
+        _user = {
+            'id': user.id,
+            'username': user.username,
+            'avatar_url': user.avatar_url.replace('-large', '-t500x500'),
+        }
+
+        return _user
+
+    def redictionize_user(self, user):
+        # useful when the miniuser is already there from another api call
+        _user = {
+            'id': user['id'],
+            'username': user['username'],
+            'avatar_url': user['avatar_url'].replace('-large', '-t500x500'),
+        }
+
+        return _user
+
+    def dictionize_track_obj(self, track, user):
         _track = {
             'id': track.id,
             'title': track.title,
-            'album': '',
+            'album': 'Soundcloud',
             'artist': user['username'],
             'album_artist': '',
             'year': track.created_at.split('/')[0],
-            'artwork_url': track.artwork_url.replace('-large', '-t500x500') if track.artwork_url else user['avatar_url'].replace('-large', '-t500x500'),
+            'artwork_url': track.artwork_url.replace('-large', '-t500x500') if track.artwork_url else user['avatar_url'],
             'purchase_url': track.purchase_url,
             'genre': track.genre,
             'bpm': track.bpm,
             'key_signature': track.key_signature,
         }
 
+        return self.track_processing(_track)
+
+    def redictionize_track(self, track, user):
+        _track = {
+            'id': track['id'],
+            'title': track['title'],
+            'album': 'Soundcloud',
+            'artist': user['username'],
+            'album_artist': '',
+            'year': track['created_at'].split('/')[0],
+            'artwork_url': track['artwork_url'].replace('-large', '-t500x500') if track['artwork_url'] else user['avatar_url'],
+            'purchase_url': track['purchase_url'],
+            'genre': track['genre'],
+            'bpm': track['bpm'],
+            'key_signature': track['key_signature'],
+        }
+
+        return self.track_processing(_track)
+
+    def dictionize_set_obj(self, playlist):
+        _playlist = {
+            'id': playlist.id,
+            'title': playlist.title,
+            'artwork_url': playlist.artwork_url.replace('-large', '-t500x500') if playlist.artwork_url else None,
+            'type': playlist.playlist_type,
+            'tracks': [],
+        }
+
+        print(_playlist['type'])
+
+        for track in playlist.tracks:
+            # maybe this is unecessary, most of this info is already in
+            # the playlist object, do a better job parsing that :P
+
+            _user = self.redictionize_user(track['user'])
+            _track = self.redictionize_track(track, _user)
+
+            # change some tags because it's an album
+            if self.playlist_albums and _playlist['type'] and any((x in _playlist['type']) for x in self.album_types):
+                _track['album'] = _playlist['title']
+
+                if not _track['artwork_url'] and _playlist['artwork_url']:
+                    _track['artwork_url'] = _playlist['artwork_url']
+
+            _playlist['tracks'].append(_track)
+
+        return _playlist
+
+    def dictionize_sets(self, playlists):
+        _playlists = []
+        for p in playlists:
+            _playlist = self.dictionize_set_obj(p)
+            _playlists.append(_playlist)
+
+        return _playlists
+
+    #########################
+    # Dictionary Processing
+    #########################
+
+    def track_processing(self, _track):
         # naming weirdness because Im a weirdo
         # who really cares about this for some reason
 
@@ -207,51 +288,3 @@ class soundcloud_parser(object):
             _track['album_artist'] = _track['artist']
 
         return _track
-
-    def get_set(self, url):
-        playlist = self.client.get('/resolve/', url=url)
-
-        _playlist = {
-            'id': playlist.id,
-            'title': playlist.title,
-            'artwork_url': playlist.artwork_url.replace('-large', '-t500x500') if playlist.artwork_url else None,
-            'type': playlist.playlist_type,
-            'tracks': [],
-        }
-
-        for t in playlist.tracks:
-            # maybe this is unecessary, most of this info is already in
-            # the playlist object, do a better job parsing that :P
-
-            track = self.client.get('/tracks/' + str(t['id']))
-            user = self.client.get('/users/' + str(track.user_id))
-
-            _user = self.dictionize_user(user)
-            _track = self.dictionize_track(track, _user)
-
-            # change some tags because it's an album
-
-            print(_playlist['type'])
-            if self.playlist_albums and _playlist['type'] and any((x in _playlist['type']) for x in self.album_types):
-                _track['album'] = _playlist['title']
-
-                if not track.artwork_url and _playlist['artwork_url']:
-                    _track['artwork_url'] = _playlist['artwork_url']
-
-            _playlist['tracks'].append(_track)
-
-        return _playlist
-
-    def get_sets(self, url):
-        # this is elegant
-        # but uses WAYYYY too many fucking API calls lol
-        # maybe do something about this
-
-        playlists = self.client.get('/resolve/', url=url)
-
-        _playlists = []
-        for p in playlists:
-            print(p.permalink_url)
-            _playlists.append(self.get_set(p.permalink_url))
-
-        return _playlists
