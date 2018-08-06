@@ -11,6 +11,7 @@ setuptools.setup(
     url="https://github.com/HardFirmSoft/SoundCloudDegater",
     packages=["soundcloud_degater"],
     install_requires=[
-        'soundcloud'
+        'soundcloud',
+        'selenium'
     ]
 )
