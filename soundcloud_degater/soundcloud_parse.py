@@ -4,13 +4,14 @@ from urllib.parse import urlparse
 
 import soundcloud
 
-from soundcloud_download import SoundCloudDownloader as Downloader
+from fanlink_parse import FanlinkParser
 
 "TODO: better error handling, if 404 returned, throws Error."
 
 
 class SoundCloudParser(object):
     """Class for processing SoundCloud data."""
+
     def __init__(self, **kwargs):
 
         self.client_id = kwargs['SC_client_id']
@@ -29,7 +30,17 @@ class SoundCloudParser(object):
     def run(self, url: str):
         call_type = self.get_call_type(url)
         tracks_to_download = self.process_call(call_type, url)
-        Downloader.download_tracks(tracks_to_download)
+
+        for track in tracks_to_download:
+            purchase_url = track['purchase_url']
+
+            if "fanlink.to" in purchase_url:
+                parser = FanlinkParser()
+            else:
+                parser = None
+
+            download = parser.parse(purchase_url)
+            print(download)
 
     ###########################
     # Basic Process Functions
@@ -94,7 +105,6 @@ class SoundCloudParser(object):
     ###############
     # Downloaders
     ###############
-
 
     ################
     # API requests

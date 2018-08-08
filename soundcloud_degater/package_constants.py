@@ -8,8 +8,17 @@ SC_client_id = 'a3dd183a357fcff9a6943c0d65664087'
 SC_domain = 'soundcloud.com'
 
 
-# CSS class names
-link_option_class = 'link-option-row-title'
+# login creds
+SC_email = 'Swift142'
+SC_password = 'July2413SC'
+
+# FB_em =
+# FB_pw
+
+# Fanlink CSS Constants
+FL_first_button_class = 'link-option-row-title'
+FL_second_button_class = 'post-gate-btn'
+
 
 # Random stuff?
 free_download = 'FREE DOWNLOAD'
@@ -21,4 +30,3 @@ fanlink = "fanlink.to"
 handled_sites = [
     fanlink,
 ]
-

@@ -1,19 +1,24 @@
 from typing import List, Dict
 
-from selenium import webdriver
-
 import package_constants as const
 from exceptions import SoundCloudDegaterException
 
 
+from contextlib import contextmanager
+
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.expected_conditions import staleness_of
+
+
 class SoundCloudDownloader(object):
     """Static class for all SoundCloud downloading functionality."""
-    driver = webdriver.Chrome()
+    browser = webdriver.Chrome()
 
     @classmethod
     def _get_webpage(cls, url: str):
         """Change the current webpage to the URL"""
-        cls.driver.get(url)
+        cls.browser.get(url)
 
     @staticmethod
     def _categorize_purchase_link(url: str) -> str:
@@ -47,9 +52,41 @@ class SoundCloudDownloader(object):
     def _download_from_fanlink(cls, url: str):
         # Currently is able to navigate to download page and find the free download button
         cls._get_webpage(url)
-        download_elements = cls.driver.find_elements_by_class_name(const.link_option_class)
+
+        # first layer
+        print('\nfirst layer')
+
+        print(cls.browser.current_url)
+        download_elements = cls.browser.find_elements_by_class_name(const.FL_first_button_class)
         for element in download_elements:
-            if element.text == const.free_download:
+            if element.text == 'FREE DOWNLOAD':
+                print(element)
                 element.click()
                 # Break cause Selenium tries to load elements that don't exist anymore
                 break
+
+        with cls.wait_for_page_load(timeout=10):
+            # second layer
+            print('\nsecond layer')
+            print(cls.browser.current_url)
+
+            download_elements = cls.browser.find_elements_by_link_text('Free Download')
+            for element in download_elements:
+                print(element)
+                element.click()
+                # Break cause Selenium tries to load elements that don't exist anymore
+                break
+
+    # def _download
+
+    ###########
+    # Utility
+    ###########
+
+    @contextmanager
+    def wait_for_page_load(cls, timeout=30):
+        old_page = cls.browser.find_element_by_tag_name('html')
+        yield
+        WebDriverWait(cls.browser, timeout).until(
+            staleness_of(old_page)
+        )
