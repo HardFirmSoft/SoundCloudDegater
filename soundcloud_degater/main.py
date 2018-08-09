@@ -1,8 +1,10 @@
 import sys
 from urllib.parse import urlparse
 
-import package_constants as const
-from soundcloud_parse import SoundCloudParser
+import util.package_constants as const
+
+from degaters.soundcloud_parse import SoundCloudParser
+import util.selenium_wrapper as sw
 
 
 def get_domain(url: str) -> str:
@@ -32,6 +34,9 @@ if __name__ == "__main__":
     }
 
     domain = urlparse(url).netloc
+
+    sw.generate_driver()   # start webdriver
+    print(sw.driver)
 
     # 'switch' based on domain type
     if const.SC_domain in domain:

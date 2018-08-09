@@ -30,3 +30,6 @@ fanlink = "fanlink.to"
 handled_sites = [
     fanlink,
 ]
+
+
+timeout = 5
