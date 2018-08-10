@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 
 import soundcloud
 
-from fanlink_parse import FanlinkParser
+from soundcloud_degater.fanlink_parse import FanlinkParser
 
 "TODO: better error handling, if 404 returned, throws Error."
 
@@ -45,7 +45,6 @@ class SoundCloudParser(object):
     ###########################
     # Basic Process Functions
     ###########################
-    # Why not just get list of tracks then download_tracks instead of having download_sets?
 
     def process_call(self, call_type: str, url: str) -> List[Dict]:
         """Depending on the call type, get list of tracks."""

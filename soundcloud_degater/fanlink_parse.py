@@ -1,8 +1,4 @@
 from typing import List, Dict
-
-import package_constants as const
-from exceptions import SoundCloudDegaterException
-
 from contextlib import contextmanager
 
 from selenium import webdriver
@@ -10,7 +6,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
-import time
+import soundcloud_degater.package_constants as const
+from soundcloud_degater.exceptions import SoundCloudDegaterException
 
 
 class FanlinkParser(object):
@@ -27,7 +24,7 @@ class FanlinkParser(object):
         self.layer1_home()  # begin traversal
 
         print('complete')
-        raise Exception
+        raise Exception     # Why? - Francis
 
     ########################
     # Sequential Traversal
@@ -35,27 +32,27 @@ class FanlinkParser(object):
 
     def layer1_home(self):
         # click 'free download' (one of many options)
-        self.gen_html_file(str(self.driver.page_source))
+        self.generate_html_file(str(self.driver.page_source))
 
-        buttons = self.filt_els_by_text('link-option-row-action', 'FREE DOWNLOAD')
+        buttons = self.filt_els_by_text(const.FL_first_button_class, const.free_download)
         if buttons:
             self.click(buttons[0])
-            self.layer2_singleDownload()
+            self.layer2_single_download()
         else:
-            self.layer2_singleDownload()    # fanlink sometimes might begin in layer2
+            self.layer2_single_download()    # fanlink sometimes might begin in layer2
 
-    def layer2_singleDownload(self):
+    def layer2_single_download(self):
         # click 'free download' (only option)
-        buttons = self.filt_els_by_text('post-gate-btn', 'FREE DOWNLOAD')
+        buttons = self.filt_els_by_text(const.FL_second_button_class, const.free_download)
         if buttons:
             self.click(buttons[0])
-            self.layer3_followSC()
+            self.layer3_follow_SC()
         else:
             self.fail()
 
-    def layer3_followSC(self):
+    def layer3_follow_SC(self):
         # click 'follow on soundcloud'
-        buttons = self.filt_els_by_text('soundcloud', 'FOLLOW ON SOUNDCLOUD')
+        buttons = self.filt_els_by_text('soundcloud', const.sound_cloud_follow)
         if buttons:
             self.click(buttons[0])
             self.layer4_give_SC_access()
@@ -71,7 +68,7 @@ class FanlinkParser(object):
                     self.click(button)
                     break
 
-            self.layer5()
+            self.layer5_sign_into_FB(self)
         else:
             self.fail()
 
@@ -79,7 +76,8 @@ class FanlinkParser(object):
 
         pass
 
-    def fail(self):
+    @staticmethod
+    def fail():
         print('failed')
         raise Exception
 
@@ -115,6 +113,8 @@ class FanlinkParser(object):
     # Utility
     ###########
 
-    def gen_html_file(self, text):
+    # What is this for? Should use a temp file. - Francis
+    @staticmethod
+    def generate_html_file(text):
         with open('page.html', 'w') as f:
             f.write(text)

@@ -1,14 +1,12 @@
 from typing import List, Dict
-
-import package_constants as const
-from exceptions import SoundCloudDegaterException
-
-
 from contextlib import contextmanager
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.expected_conditions import staleness_of
+
+import soundcloud_degater.package_constants as const
+from soundcloud_degater.exceptions import SoundCloudDegaterException
 
 
 class SoundCloudDownloader(object):
