@@ -1,41 +1,32 @@
-import util.package_constants as const
-
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
+import soundcloud_degater.util.package_constants as const
+
 #############
 # Constants
 #############
 
-driver = None
+driver = webdriver.Chrome()
 timeout = const.timeout
 
-by_types = [
-    'ID',
-    'NAME',
-    'XPATH',
-    'LINK_TEXT',
-    'PARTIAL_LINK_TEXT',
-    'TAG_NAME',
-    'CLASS_NAME',
-    'CSS_SELECTOR',
-]
+
 
 ###########
 # Setup
 ###########
 
 
-def generate_driver():
-    global driver
-    driver = webdriver.Chrome()
+def get_driver():
+    """Refers to the static driver in this file."""
+    return driver
 
 
-def set_driver(web_driver):
-    global driver
-    driver = web_driver
+def new_driver():
+    """If you want to generate a new web_driver for some reason."""
+    return webdriver.Chrome()
 
 ###################
 # Element Getters
@@ -44,74 +35,43 @@ def set_driver(web_driver):
 
 def filt_els_by_text(by, value, text):
     # returns a list of elements of a certain class WITH specific text inside
-    return [e for e in get_els_by(by, value) if e.text == text]
+    return [e for e in get_elements_with_wait(by, value) if e.text == text]
 
 
-def get_el_by(by, value):
-    if by is by_types[0]:
-        el_wait(By.ID, value)
-        return driver.find_element_by_id(value)
+def get_element_with_wait(by, value):
+    switch = {
+        'ID': [By.ID, driver.find_element_by_id],
+        'NAME': [By.NAME, driver.find_element_by_name],
+        'XPATH': [By.XPATH, driver.find_element_by_xpath],
+        'LINK_TEXT': [By.LINK_TEXT, driver.find_element_by_link_text],
+        'PARTIAL_LINK_TEXT': [By.PARTIAL_LINK_TEXT, driver.find_element_by_partial_link_text],
+        'TAG_NAME': [By.TAG_NAME, driver.find_element_by_tag_name],
+        'CLASS_NAME': [By.TAG_NAME, driver.find_element_by_class_name],
+        'CSS_SELECTOR': [By.CSS_SELECTOR, driver.find_element_by_css_selector],
+    }
 
-    if by is by_types[1]:
-        el_wait(By.NAME, value)
-        return driver.find_element_by_name(value)
-
-    elif by is by_types[2]:
-        el_wait(By.XPATH, value)
-        return driver.find_element_by_xpath(value)
-
-    elif by is by_types[3]:
-        el_wait(By.LINK_TEXT, value)
-        return driver.find_element_by_link_text(value)
-
-    elif by is by_types[4]:
-        el_wait(By.PARTIAL_LINK_TEXT, value)
-        return driver.find_element_by_partial_link_text(value)
-
-    elif by is by_types[5]:
-        el_wait(By.TAG_NAME, value)
-        return driver.find_element_by_tag_name(value)
-
-    elif by is by_types[6]:
-        el_wait(By.CLASS_NAME, value)
-        return driver.find_element_by_class_name(value)
-
-    elif by is by_types[7]:
-        el_wait(By.CSS_SELECTOR, value)
-        return driver.find_element_by_css_selector(value)
+    el_wait(switch[by][0], value)
+    return switch[by][1](value)
 
 
-def get_els_by(by, value):
-    if by is by_types[1]:
-        el_wait(By.NAME, value)
-        return driver.find_elements_by_name(value)
+def get_elements_with_wait(by, value):
+    switch = {
+        'ID': [By.ID, driver.find_elements_by_id],
+        'NAME': [By.NAME, driver.find_elements_by_name],
+        'XPATH': [By.XPATH, driver.find_elements_by_xpath],
+        'LINK_TEXT': [By.LINK_TEXT, driver.find_elements_by_link_text],
+        'PARTIAL_LINK_TEXT': [By.PARTIAL_LINK_TEXT, driver.find_elements_by_partial_link_text],
+        'TAG_NAME': [By.TAG_NAME, driver.find_elements_by_tag_name],
+        'CLASS_NAME': [By.TAG_NAME, driver.find_elements_by_class_name],
+        'CSS_SELECTOR': [By.CSS_SELECTOR, driver.find_elements_by_css_selector],
+    }
 
-    elif by is by_types[2]:
-        el_wait(By.XPATH, value)
-        return driver.find_elements_by_xpath(value)
-
-    elif by is by_types[3]:
-        el_wait(By.LINK_TEXT, value)
-        return driver.find_elements_by_link_text(value)
-
-    elif by is by_types[4]:
-        el_wait(By.PARTIAL_LINK_TEXT, value)
-        return driver.find_elements_by_partial_link_text(value)
-
-    elif by is by_types[5]:
-        el_wait(By.TAG_NAME, value)
-        return driver.find_elements_by_tag_name(value)
-
-    elif by is by_types[6]:
-        el_wait(By.CLASS_NAME, value)
-        return driver.find_elements_by_class_name(value)
-
-    elif by is by_types[7]:
-        el_wait(By.CSS_SELECTOR, value)
-        return driver.find_elements_by_css_selector(value)
+    el_wait(switch[by][0], value)
+    return switch[by][1](value)
 
 
 def el_wait(by, value):
+    """Wait until an element appears"""
     element_present = EC.presence_of_element_located((by, value))
     WebDriverWait(driver, timeout).until(element_present)
 

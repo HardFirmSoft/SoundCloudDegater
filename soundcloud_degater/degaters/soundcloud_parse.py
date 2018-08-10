@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 
 import soundcloud
 
-from degaters.fanlink_parse import FanlinkParser
+from soundcloud_degater.degaters.fanlink_parse import FanlinkParser
 
 "TODO: better error handling, if 404 returned, throws Error."
 
@@ -13,7 +13,6 @@ class SoundCloudParser(object):
     """Class for processing SoundCloud data."""
 
     def __init__(self, **kwargs):
-
         self.client_id = kwargs['SC_client_id']
 
         self.process_names = kwargs['process_names']
@@ -27,27 +26,11 @@ class SoundCloudParser(object):
         # this is the object that allows us to make easy soundcloud api calls
         self.sc_client = soundcloud.Client(client_id=self.client_id)
 
-    def run(self, url: str):
-        call_type = self.get_call_type(url)
-        tracks_to_download = self.process_call(call_type, url)
-
-        for track in tracks_to_download:
-            purchase_url = track['purchase_url']
-
-            if "fanlink.to" in purchase_url:
-                parser = FanlinkParser()
-            else:
-                parser = None
-
-            download = parser.parse(purchase_url)
-            print(download)
-
     ###########################
     # Basic Process Functions
     ###########################
-    # Why not just get list of tracks then download_tracks instead of having download_sets?
 
-    def process_call(self, call_type: str, url: str) -> List[Dict]:
+    def get_track_list(self, call_type: str, url: str) -> List[Dict]:
         """Depending on the call type, get list of tracks."""
         tracks = []
 
@@ -59,7 +42,6 @@ class SoundCloudParser(object):
             tracks += self.get_set(url)['tracks']
         elif call_type == 'sets':
             tracks += [track for track in [set['tracks'] for set in self.get_sets(url)]]
-
         return tracks
 
     ##############

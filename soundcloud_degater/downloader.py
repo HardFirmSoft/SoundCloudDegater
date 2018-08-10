@@ -5,8 +5,8 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.expected_conditions import staleness_of
 
-import soundcloud_degater.package_constants as const
-from soundcloud_degater.exceptions import SoundCloudDegaterException
+import soundcloud_degater.util.package_constants as const
+from soundcloud_degater.util.exceptions import SoundCloudDegaterException
 
 
 class SoundCloudDownloader(object):
