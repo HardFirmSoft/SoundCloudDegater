@@ -12,7 +12,7 @@ def validate_url(url: str):
     domain = urlparse(url).netloc
     if const.SC_domain not in domain:
         click.ClickException("Not a SoundCloud URL!")
-    sys.exit()
+        sys.exit()
 
 
 def main(url, social, email, password):
@@ -40,6 +40,7 @@ def main(url, social, email, password):
         download = parser.parse(purchase_url)
         print(download)
 
+
 @click.command()
 @click.argument('url')
 @click.option('--social', '-s', is_flag=True, default=False,
@@ -49,3 +50,6 @@ def main(url, social, email, password):
 def cli(url, social, email, password):
     main(url, social, email, password)
 
+
+if __name__ == "__main__":
+    cli()

@@ -32,4 +32,4 @@ handled_sites = [
 ]
 
 
-timeout = 5
+timeout = 10

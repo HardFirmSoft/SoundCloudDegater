@@ -12,8 +12,6 @@ import soundcloud_degater.util.package_constants as const
 driver = webdriver.Chrome()
 timeout = const.timeout
 
-
-
 ###########
 # Setup
 ###########
@@ -46,7 +44,7 @@ def get_element_with_wait(by, value):
         'LINK_TEXT': [By.LINK_TEXT, driver.find_element_by_link_text],
         'PARTIAL_LINK_TEXT': [By.PARTIAL_LINK_TEXT, driver.find_element_by_partial_link_text],
         'TAG_NAME': [By.TAG_NAME, driver.find_element_by_tag_name],
-        'CLASS_NAME': [By.TAG_NAME, driver.find_element_by_class_name],
+        'CLASS_NAME': [By.CLASS_NAME, driver.find_element_by_class_name],
         'CSS_SELECTOR': [By.CSS_SELECTOR, driver.find_element_by_css_selector],
     }
 
@@ -62,7 +60,7 @@ def get_elements_with_wait(by, value):
         'LINK_TEXT': [By.LINK_TEXT, driver.find_elements_by_link_text],
         'PARTIAL_LINK_TEXT': [By.PARTIAL_LINK_TEXT, driver.find_elements_by_partial_link_text],
         'TAG_NAME': [By.TAG_NAME, driver.find_elements_by_tag_name],
-        'CLASS_NAME': [By.TAG_NAME, driver.find_elements_by_class_name],
+        'CLASS_NAME': [By.CLASS_NAME, driver.find_elements_by_class_name],
         'CSS_SELECTOR': [By.CSS_SELECTOR, driver.find_elements_by_css_selector],
     }
 
