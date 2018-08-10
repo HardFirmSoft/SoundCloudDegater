@@ -13,16 +13,16 @@ SC_email = 'Swift142'
 SC_password = 'July2413SC'
 
 # FB_em =
-# FB_pw
+# FB_pw =
 
 # Fanlink CSS Constants
 FL_first_button_class = 'link-option-row-title'
 FL_second_button_class = 'post-gate-btn'
 
 
-# Random stuff?
+# Generic constants
 free_download = 'FREE DOWNLOAD'
-
+sound_cloud_follow = 'FOLLOW ON SOUNDCLOUD'
 
 # Sites we are able to download from.
 

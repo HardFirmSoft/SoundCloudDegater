@@ -8,10 +8,15 @@ setuptools.setup(
     description="Download from SoundCloud in the best quality, regardless of gates.",
     long_description=readme,
     long_description_content_type="text/markdown",
-    url="https://github.com/HardFirmSoft/SoundCloudDegater",
+    url="https://github.com/noahbaxter/SoundCloudDegater",
     packages=["soundcloud_degater"],
     install_requires=[
         'soundcloud',
-        'selenium'
-    ]
+        'selenium',
+        'click',
+    ],
+    entry_points='''
+        [console_scripts]
+        scdegater=soundcloud_degater.main:cli
+    '''
 )
