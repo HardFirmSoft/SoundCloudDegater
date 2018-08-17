@@ -53,13 +53,10 @@ class FanlinkParser(object):
 
     def layer4_give_SC_access(self):
         # in new window, click on FB signup
-        social_buttons = sw.get_element_with_wait('CLASS_NAME', 'connect-social-buttons')
+        sw.get(const.SC_access_toneden)
+        social_buttons = sw.get_elements_with_wait('PARTIAL_LINK_TEXT', 'Sign in with Facebook')
         if social_buttons:
-            for button in social_buttons:
-                if self.social_connector in button.CLASS_NAME:
-                    sw.click(button)
-                    break
-
+            sw.click(social_buttons[0])
             self.layer5_sign_into_FB()
         else:
             self.fail()
