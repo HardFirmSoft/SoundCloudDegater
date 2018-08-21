@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -9,7 +10,9 @@ import soundcloud_degater.util.package_constants as const
 # Constants
 #############
 
-driver = webdriver.Chrome()
+chrome_options = Options()
+#chrome_options.add_argument("--headless")
+driver = webdriver.Chrome(chrome_options=chrome_options)
 timeout = const.timeout
 
 ###########
@@ -26,6 +29,11 @@ def new_driver():
     """If you want to generate a new web_driver for some reason."""
     return webdriver.Chrome()
 
+
+def new_headless_driver():
+    options = Options()
+    options.add_argument("--headless")
+    return webdriver.Chrome(chrome_options=options)
 ###################
 # Element Getters
 ###################

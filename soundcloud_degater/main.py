@@ -33,7 +33,7 @@ def main(url, social, email, password):
         purchase_url = track['purchase_url']
 
         if "fanlink.to" in purchase_url:
-            parser = FanlinkParser()
+            parser = FanlinkParser(email[0], password[0])
         else:
             parser = None
 

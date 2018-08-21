@@ -1,5 +1,7 @@
 from typing import List, Dict
 
+from selenium.webdriver.common.keys import Keys
+
 import soundcloud_degater.util.package_constants as const
 import soundcloud_degater.util.selenium_wrapper as sw
 
@@ -8,9 +10,10 @@ import soundcloud_degater.util.selenium_wrapper as sw
 
 class FanlinkParser(object):
 
-    def __init__(self, social_connector='facebook'):
+    def __init__(self, fb_email, fb_password):
         self.timeout = 5
-        self.social_connector = social_connector
+        self._fb_password = fb_password
+        self._email = fb_email
 
     def parse(self, url):
         sw.get(url)
@@ -46,14 +49,17 @@ class FanlinkParser(object):
         # click 'follow on soundcloud'
         buttons = sw.filt_els_by_text('CLASS_NAME', 'soundcloud', 'FOLLOW ON SOUNDCLOUD')
         if buttons:
+            window_before = sw.driver.window_handles[0]
             sw.click(buttons[0])
-            self.layer4_give_SC_access()
+            sw.driver.switch_to_window(sw.driver.window_handles[1])
+            self.layer4_click_facebook_button(window_before)
+
         else:
             self.fail()
 
-    def layer4_give_SC_access(self):
+    def layer4_click_facebook_button(self, window_before):
         # in new window, click on FB signup
-        sw.get(const.SC_access_toneden)
+
         social_buttons = sw.get_elements_with_wait('PARTIAL_LINK_TEXT', 'Sign in with Facebook')
         if social_buttons:
             sw.click(social_buttons[0])
@@ -62,8 +68,11 @@ class FanlinkParser(object):
             self.fail()
 
     def layer5_sign_into_FB(self):
-
-        pass
+        email_box = sw.get_element_with_wait("XPATH", "//*[@id='email']")
+        email_box.send_keys(self._email)
+        password_box = sw.get_element_with_wait("XPATH", "//*[@id='pass']")
+        password_box.send_keys(self._fb_password)
+        password_box.send_keys(Keys.RETURN)
 
     # Definitely need to improve on this.
     def fail(self):
